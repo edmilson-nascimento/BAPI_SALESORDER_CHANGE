@@ -81,18 +81,18 @@ REPORT yteste.
 
 
 
-PARAMETERS: p_vbeln  TYPE vbap-vbeln OBLIGATORY DEFAULT '3140000123', "Order Number
-            p_posnr  TYPE vbap-posnr OBLIGATORY, "Order Item
-            p_etenr  TYPE vbep-etenr OBLIGATORY, "Schedule Line
-            p_reqqty TYPE bapischdl-req_qty OBLIGATORY. " Order Qty
+PARAMETERS:
+  p_vbeln  TYPE vbap-vbeln        OBLIGATORY DEFAULT '3140000123', "Order Number
+  p_posnr  TYPE vbap-posnr        OBLIGATORY, "Order Item
+  p_etenr  TYPE vbep-etenr        OBLIGATORY, "Schedule Line
+  p_reqqty TYPE bapischdl-req_qty OBLIGATORY. " Order Qty
 
-*----
 
 
-DATA: i_hdr  TYPE bapisdh1,
-      i_hdrx TYPE bapisdh1x,
-      i_ret  TYPE bapiret2 OCCURS 0 WITH HEADER LINE,
-      wa_ret TYPE bapiret2.
+DATA:
+  i_hdrx TYPE bapisdh1x,
+  i_ret  TYPE bapiret2 OCCURS 0 WITH HEADER LINE,
+  wa_ret TYPE bapiret2.
 
 DATA: BEGIN OF i_sched OCCURS 10.
         INCLUDE STRUCTURE bapischdl.
@@ -156,12 +156,10 @@ START-OF-SELECTION.
 *     extensionout        = extensionout
     .
 
-*" Fill required ORDER_HEADER_IN data.
-
+  " Fill required ORDER_HEADER_IN data
   i_hdrx-updateflag = 'U'.
 
   " Fill required SCHEDULE_LINES data.
-
   i_sched-itm_number  = p_posnr.
   i_sched-sched_line  = p_etenr.
   i_sched-req_qty     = p_reqqty.
