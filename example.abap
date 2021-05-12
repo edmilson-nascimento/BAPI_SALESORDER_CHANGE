@@ -92,7 +92,7 @@ START-OF-SELECTION.
 
   CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
     EXPORTING
-      salesdocument    = p_vbeln
+      salesdocument    = |{ p_vbeln ALPHA = IN }|
       order_header_in  = ls_order_header_in
       order_header_inx = ls_order_header_inx
     TABLES
@@ -102,8 +102,6 @@ START-OF-SELECTION.
 
   CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
 
-*  LOOP AT lt_return.
-*
-*    WRITE / lt_return-message.
-*
-*  ENDLOOP.
+  LOOP AT lt_return INTO ls_return .
+    WRITE / ls_return-message .
+  ENDLOOP.
