@@ -66,7 +66,7 @@ PARAMETERS:
 INITIALIZATION .
 
   p_vbeln =
-    CONV vbap-posnr( 3130000527 ) .
+    CONV vbap-vbeln( 105498 ) .
   p_posnr =
     CONV vbap-posnr( 20 ) .
 
@@ -161,8 +161,13 @@ START-OF-SELECTION .
               gst_schedule_linesx-updateflag = 'U'.
 
 *           Setting the new order quantity(WMENG).
-              gst_schedule_lines-req_qty  = p_wmeng.
-              gst_schedule_linesx-req_qty = 'X'.
+              IF ( lines( gt_schedule_lines ) EQ 0 ) .
+                gst_schedule_lines-req_qty  = p_wmeng.
+                gst_schedule_linesx-req_qty = 'X'.
+              ELSE .
+                gst_schedule_lines-req_qty  = 0.
+                gst_schedule_linesx-req_qty = 'X'.
+              ENDIF .
 
 *           BAPI schedule lines level tables:
               APPEND:
@@ -233,6 +238,18 @@ START-OF-SELECTION .
 
 *       Output message.
           WRITE / gv_msg.
+
+          LOOP AT gt_return INTO DATA(ls_return) .
+            MESSAGE ID ls_return-id
+               TYPE ls_return-type
+             NUMBER ls_return-number
+               INTO DATA(gv_text)
+               WITH ls_return-message_v1
+                    ls_return-message_v2
+                    ls_return-message_v3
+                    ls_return-message_v4 .
+            WRITE / gv_text .
+          ENDLOOP .
 
 *     Else, no error found, commit database changes.
         ELSE.
