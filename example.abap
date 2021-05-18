@@ -111,22 +111,22 @@ DATA:
 
 *Constants:
 CONSTANTS:
-  gc_error   TYPE string
+  gc_not_found TYPE string
+        VALUE ': Sales order not found.',
+  gc_error     TYPE string
         VALUE ': An error occured, no change done to the sales order.',
-  gc_success TYPE string
+  gc_success   TYPE string
         VALUE ': Sales order changed successfully.'.
 
 ************************************************************************
 * SELECTION SCREEN                                                     *
 ************************************************************************
-SELECT-OPTIONS:
-*  Sales Order Number.
-   s_vbeln FOR vbap-vbeln OBLIGATORY.
 
 PARAMETERS:
-** Reason for Rejection.
-*  p_abgru TYPE vbap-abgru OBLIGATORY,
-
+*  Sales Order Number.
+  p_vbeln TYPE vbap-vbeln OBLIGATORY,
+* Order Quantity.
+  p_posnr TYPE vbap-posnr OBLIGATORY,
 * Order Quantity.
   p_wmeng TYPE vbep-wmeng OBLIGATORY.
 
@@ -137,10 +137,10 @@ PARAMETERS:
 
 INITIALIZATION .
 
-  s_vbeln[] =
-    VALUE #( ( sign   = 'I'
-               option = 'EQ'
-               low    = '3130000527' ) ) .
+  p_vbeln =
+    CONV vbap-posnr( 3130000527 ) .
+  p_posnr =
+    CONV vbap-posnr( 20 ) .
 
 START-OF-SELECTION .
 
@@ -148,14 +148,13 @@ START-OF-SELECTION .
   SELECT *
     FROM vbap
     INTO TABLE gt_vbap
-    WHERE vbeln IN s_vbeln
-      AND posnr EQ 20 .
+    WHERE vbeln EQ p_vbeln
+      AND posnr EQ p_posnr .
 
   IF sy-subrc EQ 0.
 
 * Rules 'For All Entries'.
-* Not necessary as 'VBELN' and 'POSNR' is already primary key, this
-*                                                              logic
+* Not necessary as 'VBELN' and 'POSNR' is already primary key, this logic
 * just to demonstrate 'For All Entries' rule.
     SORT gt_vbap BY vbeln posnr.
     DELETE ADJACENT DUPLICATES FROM gt_vbap COMPARING vbeln posnr.
@@ -352,5 +351,10 @@ START-OF-SELECTION .
       ENDLOOP.
 
     ENDIF.
+
+  ELSE .
+
+*   Output message.
+    WRITE / gc_not_found .
 
   ENDIF.
